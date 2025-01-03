@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:projek_bounty_hunter/models/candi.dart';
-import 'package:projek_bounty_hunter/data/candi_data.dart';
+import 'package:booklist/models/candi.dart';
+import 'package:booklist/data/candi_data.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:projek_bounty_hunter/data/candi_data.dart';
-import 'package:projek_bounty_hunter/models/candi.dart';
-import 'package:projek_bounty_hunter/screens/Detail.dart';
+import 'package:booklist/data/candi_data.dart';
+import 'package:booklist/models/candi.dart';
+import 'package:booklist/screens/Detail.dart';
 
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});

@@ -1,4 +1,4 @@
-import 'package:projek_bounty_hunter/models/candi.dart';
+import 'package:booklist/models/candi.dart';
 
 var candiList = [
   Candi(

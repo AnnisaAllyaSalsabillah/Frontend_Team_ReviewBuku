@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:projek_bounty_hunter/screens/Home.dart';
-import 'package:projek_bounty_hunter/screens/Favorite.dart';
-import 'package:projek_bounty_hunter/screens/Profile.dart';
-import 'package:projek_bounty_hunter/screens/Report.dart';
-import 'package:projek_bounty_hunter/screens/SignIn.dart';
-import 'package:projek_bounty_hunter/screens/SignUp.dart';
+import 'package:booklist/screens/Home.dart';
+import 'package:booklist/screens/Favorite.dart';
+import 'package:booklist/screens/Profile.dart';
+import 'package:booklist/screens/Report.dart';
+import 'package:booklist/screens/SignIn.dart';
+import 'package:booklist/screens/SignUp.dart';
 import 'package:bottom_bar_matu/bottom_bar_matu.dart';
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 
@@ -17,23 +17,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
       title: 'Flutter App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home:   FlutterSplashScreen.fadeIn(
-          backgroundColor: const Color.fromRGBO(
-          255, 248, 242, 1),
-          childWidget: SizedBox(
-            height: 200,
-            width: 200,
-            child: Image.asset("images/Logo MDP.jpeg"),
-          ),
-          
-          nextScreen: const SignInScreen(),
+      home: FlutterSplashScreen.fadeIn(
+        backgroundColor: const Color.fromRGBO(255, 248, 242, 1),
+        childWidget: SizedBox(
+          height: 200,
+          width: 200,
+          child: Image.asset("images/Logo MDP.jpeg"),
         ),
+        nextScreen: const SignInScreen(),
+      ),
       initialRoute: '/',
       routes: {
         '/mainscreen': (context) => const MainScreen(),
@@ -58,7 +55,6 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
@@ -66,7 +62,7 @@ class _MainScreenState extends State<MainScreen> {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 10,
               blurRadius: 7,
-              offset: const Offset(0,3),
+              offset: const Offset(0, 3),
             ),
           ],
         ),
@@ -116,6 +112,6 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-            );
+    );
   }
 }

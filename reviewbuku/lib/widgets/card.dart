@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:projek_bounty_hunter/models/candi.dart';
-import 'package:projek_bounty_hunter/screens/Detail.dart';
+import 'package:booklist/models/candi.dart';
+import 'package:booklist/screens/Detail.dart';
 
 class ItemCard extends StatelessWidget {
   final Candi candi;
