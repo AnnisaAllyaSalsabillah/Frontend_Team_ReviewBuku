@@ -20,44 +20,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int favoriteCandiCount = 0;
   File? image;
 
-   // Fungsi untuk Sign In
+  // Fungsi untuk Sign In
   void signIn() {
     Navigator.pushNamed(context, '/signin');
   }
 
   // Fungsi untuk Logout, menghapus data yang tersimpan
   Future<void> logOut() async {
-   final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isSignedIn', false);
-    // await prefs.setString('name', '');
-    // await prefs.setString('username', '');
-    // await prefs.setString('password', '');
     Navigator.pushReplacementNamed(context, '/signin');
   }
-
 
   // Fungsi untuk mengambil gambar
   Future<void> selectImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? selectedImage = await picker.pickImage(source: ImageSource.camera);
-    
+    final XFile? selectedImage =
+        await picker.pickImage(source: ImageSource.camera);
+
     if (selectedImage != null) {
       setState(() {
-        image = File(selectedImage.path); 
-        print("Selected image path: ${selectedImage.path}");  // Set the image file to the state
+        image = File(selectedImage.path);
+        print(
+            "Selected image path: ${selectedImage.path}"); // Set the image file to the state
       });
     }
   }
 
-   // Fungsi untuk menyimpan jumlah favorite
+  // Fungsi untuk menyimpan jumlah favorite
   Future<void> _saveFavoriteCount() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setInt('favoriteCandiCount', favoriteCandiCount);
   }
-  
+
   // Fungsi untuk mengedit user name
   Future<void> _editUserName() async {
-    final TextEditingController controller = TextEditingController(text: userName);
+    final TextEditingController controller =
+        TextEditingController(text: userName);
 
     await showDialog(
       context: context,
@@ -76,7 +75,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             TextButton(
               child: const Text('Save'),
               onPressed: () async {
-                final SharedPreferences prefs = await SharedPreferences.getInstance();
+                final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
                 setState(() {
                   userName = controller.text;
                 });
@@ -90,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-   // Fungsi untuk mengenkripsi teks
+  // Fungsi untuk mengenkripsi teks
   String encryptText(String text) {
     return base64.encode(utf8.encode(text));
   }
@@ -102,7 +102,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Fungsi untuk mengedit full name
   Future<void> _editFullName() async {
-    final TextEditingController controller = TextEditingController(text: fullName);
+    final TextEditingController controller =
+        TextEditingController(text: fullName);
 
     await showDialog(
       context: context,
@@ -122,7 +123,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: const Text('Save'),
               onPressed: () async {
                 final String newName = controller.text;
-                final SharedPreferences prefs = await SharedPreferences.getInstance();
+                final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
                 final String encryptedName = encryptText(newName);
 
                 setState(() {
@@ -142,11 +144,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLoginStatus();  // Mengecek status login saat pertama kali membuka layar
-    _loadProfileData();  // Memuat data profil pengguna
+    _checkLoginStatus();
+    _loadProfileData();
   }
 
-    // Mengecek status login dari SharedPreferences
+  // Mengecek status login dari SharedPreferences
   Future<void> _checkLoginStatus() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final bool? signedIn = prefs.getBool('isSignedIn');
@@ -157,55 +159,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Navigator.pushReplacementNamed(context, '/signin');
     }
   }
-Future<Map<String, String>> _retrieveAndDecryptDataFromPrefs(
-  SharedPreferences sharedPreferences,
-) async {
-  try {
-    final encryptedUsername = sharedPreferences.getString('username');
-    final encryptedPassword = sharedPreferences.getString('fullname');
-    final keyString = sharedPreferences.getString('key');
-    final ivString = sharedPreferences.getString('iv');
 
-    if (encryptedUsername == null ||
-        encryptedPassword == null ||
-        keyString == null ||
-        ivString == null) {
-      throw Exception('Missing credentials in SharedPreferences.');
-    }
+  Future<Map<String, String>> _retrieveAndDecryptDataFromPrefs(
+    SharedPreferences sharedPreferences,
+  ) async {
+    try {
+      final encryptedUsername = sharedPreferences.getString('username');
+      final encryptedPassword = sharedPreferences.getString('fullname');
+      final keyString = sharedPreferences.getString('key');
+      final ivString = sharedPreferences.getString('iv');
 
-    final encrypt.Key key = encrypt.Key.fromBase64(keyString);
-    final encrypt.IV iv = encrypt.IV.fromBase64(ivString);
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
-
-    final decryptedUsername = encrypter.decrypt64(encryptedUsername, iv: iv);
-    final decryptedPassword = encrypter.decrypt64(encryptedPassword, iv: iv);
-
-    return {'username': decryptedUsername, 'fullname': decryptedPassword};
-  } catch (e) {
-    print('Decryption failed: $e');
-    return {};
-  }
-}
-   // Memuat data profil pengguna dari SharedPreferences
-  Future<void> _loadProfileData() async {
-     final prefs = await SharedPreferences.getInstance();
-     final data = await _retrieveAndDecryptDataFromPrefs(prefs);
-
-      if (data.isNotEmpty) {
-        final decryptedUsername = data['username'];
-        final decryptedPassword = data['fullname'];
-        setState(() {
-          fullName = decryptedPassword ?? "Fullname tidak ditemukan.";
-          userName = decryptedUsername ?? "Username tidak ditemukan."; // Ambil username
-          favoriteCandiCount = prefs.getInt('favoriteCandiCount') ?? 0; // Ambil count favorite
-          });
+      if (encryptedUsername == null ||
+          encryptedPassword == null ||
+          keyString == null ||
+          ivString == null) {
+        throw Exception('Missing credentials in SharedPreferences.');
       }
+
+      final encrypt.Key key = encrypt.Key.fromBase64(keyString);
+      final encrypt.IV iv = encrypt.IV.fromBase64(ivString);
+      final encrypter = encrypt.Encrypter(encrypt.AES(key));
+
+      final decryptedUsername = encrypter.decrypt64(encryptedUsername, iv: iv);
+      final decryptedPassword = encrypter.decrypt64(encryptedPassword, iv: iv);
+
+      return {'username': decryptedUsername, 'fullname': decryptedPassword};
+    } catch (e) {
+      print('Decryption failed: $e');
+      return {};
+    }
+  }
+
+  // Memuat data profil pengguna dari SharedPreferences
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = await _retrieveAndDecryptDataFromPrefs(prefs);
+
+    if (data.isNotEmpty) {
+      final decryptedUsername = data['username'];
+      final decryptedPassword = data['fullname'];
+      setState(() {
+        fullName = decryptedPassword ?? "Fullname tidak ditemukan.";
+        userName =
+            decryptedUsername ?? "Username tidak ditemukan."; // Ambil username
+        favoriteCandiCount =
+            prefs.getInt('favoriteCandiCount') ?? 0; // Ambil count favorite
+      });
+    }
   }
 
   // Fungsi untuk menyimpan data saat user mendaftar
   Future<void> saveProfileData(String name, String username) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('currentName', encryptText(name)); // Simpan nama lengkap terenkripsi
+    await prefs.setString(
+        'currentName', encryptText(name)); // Simpan nama lengkap terenkripsi
     await prefs.setString('currentUsername', username); // Simpan username
     await prefs.setBool('isSignedIn', true); // Set status login
   }
@@ -213,174 +220,188 @@ Future<Map<String, String>> _retrieveAndDecryptDataFromPrefs(
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+      body: Column(
         children: [
-          Container(
-            height: 200, width: double.infinity, color: Colors.deepPurple,
+          // Bagian header dengan background ungu dan avatar
+          Stack(
+            children: [
+              Container(
+                height: 250,
+                width: double.infinity,
+                color: Color.fromRGBO(210, 190, 223, 1.0),
+              ),
+              Positioned(
+                top: 125 - 50, // Atur agar avatar berada di tengah area ungu
+                left: MediaQuery.of(context).size.width / 2 - 50,
+                child: Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Color.fromRGBO(210, 190, 223, 1.0),
+                          width: 2,
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundImage: image == null
+                            ? const AssetImage('images/placeholder_image.png')
+                            : FileImage(image!) as ImageProvider,
+                      ),
+                    ),
+                    if (isSignedIn)
+                      IconButton(
+                        onPressed: selectImage,
+                        icon: Icon(
+                          Icons.camera_alt,
+                          color: Colors.deepPurple[50],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                // Profile Header dengan gambar profil
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 200 - 50),
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
+          const SizedBox(height: 8),
+
+          // Bagian konten (UserName, Name, Favorite)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  // UserName
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(210, 190, 223, 0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.deepPurple,
-                              width: 2,
-                            ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundImage: image == null
-                                ? const AssetImage('images/placeholder_image.png')
-                                : FileImage(image!) as ImageProvider,
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width / 3,
+                          child: const Row(
+                            children: [
+                              SizedBox(width: 8),
+                              Text(
+                                'User Name ',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        if (isSignedIn)
-                          IconButton(
-                            onPressed: selectImage,
-                            icon: Icon(
-                              Icons.camera_alt,
-                              color: Colors.deepPurple[50],
-                            ),
+                        Expanded(
+                          child: Text(
+                            ': $userName',
+                            style: const TextStyle(fontSize: 18),
                           ),
+                        ),
+                        IconButton(
+                          icon:
+                              const Icon(Icons.edit, color: Colors.deepPurple),
+                          onPressed: _editUserName,
+                        ),
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Divider(color: Colors.deepPurple[100]),
-                const SizedBox(height: 4),
 
-                // Baris UserName
-                Row(
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 3,
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.lock,
-                            color: Colors.amber,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            'User Name ',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                  // Full Name
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(210, 190, 223, 0.5),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    Expanded(
-                      child: Text(
-                        ': $userName',
-                        style: const TextStyle(fontSize: 18),
-                      ),
+                    padding: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width / 3,
+                          child: const Row(
+                            children: [
+                              SizedBox(width: 8),
+                              Text(
+                                'Name ',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            ': $fullName',
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.edit, color: Colors.deepPurple),
+                          onPressed: _editFullName,
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      icon: Icon(Icons.edit, color: Colors.deepPurple),
-                      onPressed: _editUserName, // Fungsi untuk mengedit nama pengguna
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Divider(color: Colors.deepPurple[100]),
-                const SizedBox(height: 4),
+                  ),
 
-                // Baris Full Name
-                Row(
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 3,
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.lock,
-                            color: Colors.amber,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            'Name ',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                  // Favorite
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(210, 190, 223, 0.5),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    Expanded(
-                      child: Text(
-                        ': $fullName',
-                        style: const TextStyle(fontSize: 18),
-                      ),
+                    padding: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width / 3,
+                          child: const Row(
+                            children: [
+                              SizedBox(width: 8),
+                              Text(
+                                'Favorite ',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            favoriteCandiCount > 0
+                                ? ': $favoriteCandiCount'
+                                : ': No Favorites',
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      icon: Icon(Icons.edit, color: Colors.deepPurple),
-                      onPressed: _editFullName, // Fungsi untuk mengedit nama lengkap
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Divider(color: Colors.deepPurple[100]),
-                const SizedBox(height: 4),
+                  ),
+                  const SizedBox(height: 10),
 
-                Row(
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 3,
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.lock,
-                            color: Colors.amber,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            'Favorite ',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                  // Tombol Sign In / Log Out
+                  if (isSignedIn)
+                    TextButton(
+                      onPressed: logOut,
+                      child: const Text('Log Out'),
+                    )
+                  else
+                    TextButton(
+                      onPressed: signIn,
+                      child: const Text('Sign in'),
                     ),
-                    Expanded(
-                      child: Text(
-                        favoriteCandiCount > 0
-                            ? ': $favoriteCandiCount'
-                            : ': No Favorites', 
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Divider(color: Colors.deepPurple[100]),
-                const SizedBox(height: 20),
-                isSignedIn
-                    ? TextButton(onPressed: logOut, child: const Text('Log Out'))
-                    : TextButton(onPressed: signIn, child: const Text('Sign in')),
-              ],
+                ],
+              ),
             ),
           ),
         ],

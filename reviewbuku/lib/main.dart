@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:booklist/screens/Home.dart';
 import 'package:booklist/screens/Favorite.dart';
 import 'package:booklist/screens/Profile.dart';
-import 'package:booklist/screens/Report.dart';
 import 'package:booklist/screens/SignIn.dart';
 import 'package:booklist/screens/SignUp.dart';
-import 'package:bottom_bar_matu/bottom_bar_matu.dart';
 import 'package:another_flutter_splash_screen/another_flutter_splash_screen.dart';
 
 void main() {
@@ -18,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter App',
+      title: 'Book List',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -50,67 +48,52 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
   final PageController controller = PageController();
+
+  final List<Widget> _pages = const [
+    HomeScreen(),
+    FavoriteScreen(),
+    ProfileScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 10,
-              blurRadius: 7,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: BottomBarBubble(
-          backgroundColor: const Color.fromRGBO(240, 238, 225, 1),
-          selectedIndex: 0,
-          color: Colors.black,
-          height: 60,
-          items: [
-            BottomBarItem(
-              iconData: Icons.home,
-              // label: 'Home',
-            ),
-            BottomBarItem(
-              iconData: Icons.description,
-              // label: 'Chat',
-            ),
-            BottomBarItem(
-              iconData: Icons.star,
-              // label: 'Notification',
-            ),
-            BottomBarItem(
-              iconData: Icons.person,
-              // label: 'Calendar',
-            ),
-          ],
-          onSelect: (index) {
-            // implement your select function here
-            controller.jumpToPage(index);
-          },
-        ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+          controller.jumpToPage(index);
+        },
+        selectedItemColor: Color.fromRGBO(101, 85, 143, 1.0),
+        unselectedItemColor: Colors.grey,
+        backgroundColor: const Color.fromRGBO(240, 238, 225, 1),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star),
+            label: 'Favorite',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
       ),
       body: PageView(
         controller: controller,
-        children: <Widget>[
-          const Center(
-            child: HomeScreen(),
-          ),
-          const Center(
-            child: ReportScreen(),
-          ),
-          Center(
-            child: FavoriteScreen(),
-          ),
-          const Center(
-            child: ProfileScreen(),
-          ),
-        ],
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        children: _pages,
       ),
     );
   }
